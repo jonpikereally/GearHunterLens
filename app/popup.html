@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gear Hunter Lens</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header class="top">
+    <h1>Gear Hunter Lens</h1>
+    <label class="switch" title="Turn hiding on or off">
+      <input id="enabled" type="checkbox"><span class="track"></span><span class="sr">Hide seen items</span>
+    </label>
+  </header>
+
+  <div id="banners"></div>
+
+  <main>
+    <section class="card" id="tabCard">
+      <div class="big"><span id="hiddenCount">0</span> <span id="hiddenLabel">hidden on this page</span></div>
+      <label class="check"><input id="peek" type="checkbox"> Peek at hidden items</label>
+      <p class="muted" id="offNote" hidden>Hiding is off. Listings are still being remembered.</p>
+    </section>
+
+    <h2>Price changes <span class="muted" id="changesCount"></span></h2>
+    <ul id="changes" class="changes"></ul>
+    <p id="noChanges" class="muted">No price changes yet. When a item you've seen comes back at a different price, it stays visible on GearHunter with a ↓ or ↑ tag, and shows up here.</p>
+
+    <details id="settings">
+      <summary>Settings</summary>
+      <label class="field">Count a item as seen after it's on screen for
+        <select id="seenMs">
+          <option value="500">½ second</option>
+          <option value="1000">1 second</option>
+          <option value="2000">2 seconds</option>
+          <option value="3000">3 seconds</option>
+        </select>
+      </label>
+      <fieldset class="choice">
+        <legend>Hidden items</legend>
+        <label class="check"><input type="radio" name="hideStyle" value="blur">
+          <span>Blur them<br><span class="muted">They keep their spot in the grid, blurred, with "Seen · Click to show" on top.</span></span></label>
+        <label class="check"><input type="radio" name="hideStyle" value="cover">
+          <span>Cover them<br><span class="muted">Like blur, but with a solid panel instead.</span></span></label>
+        <label class="check"><input type="radio" name="hideStyle" value="collapse">
+          <span>Remove them<br><span class="muted">They disappear from the grid, so new items move up.</span></span></label>
+      </fieldset>
+      <div class="field" id="blurField">
+        <label for="blurPx">Blur strength <span class="muted" id="blurLabel"></span></label>
+        <div class="slider-row">
+          <span class="muted">Light</span>
+          <input id="blurPx" type="range" min="2" max="30" step="1">
+          <span class="muted">Unreadable</span>
+        </div>
+        <div class="blur-preview" aria-hidden="true">
+          <div class="blur-sample"><span class="ph"></span><b>CA$450</b><span>Road bike, 56cm</span><span class="muted">Toronto, ON</span></div>
+          <div class="blur-veil"><b>Seen 3 days ago</b></div>
+        </div>
+      </div>
+      <label class="check"><input id="hideRightAway" type="checkbox">
+        <span>Hide items as soon as I scroll past them<br><span class="muted">Off: they're hidden from your next visit or reload, so the page doesn't jump while you browse.</span></span></label>
+      <label class="field">Show seen items again after
+        <select id="forgetDays">
+          <option value="0">Never</option>
+          <option value="7">7 days</option>
+          <option value="30">30 days</option>
+          <option value="90">90 days</option>
+        </select>
+      </label>
+
+      <h3>Your data</h3>
+      <p class="muted">Remembering <strong id="total">0</strong> items. Stored in this browser only, never sent anywhere.</p>
+      <div class="row">
+        <button class="btn" id="export">Export backup</button>
+        <button class="btn" id="import">Import backup</button>
+        <button class="btn danger" id="forget">Forget all seen items</button>
+        <input id="importFile" type="file" accept=".json,application/json" hidden>
+      </div>
+      <p id="dataResult" class="muted"></p>
+
+      <h3>Updates</h3>
+      <p class="muted" id="versionLine"></p>
+      <button class="btn" id="checkUpdates">Check for Updates…</button>
+      <div id="updateResult"></div>
+      <label class="field">Update source <span class="muted">(leave empty for the built-in GitHub feed)</span>
+        <input id="updateSource" type="url" placeholder="https://…/latest.json">
+      </label>
+      <p><a id="ghLink" target="_blank">Gear Hunter Lens on GitHub</a> · <a id="errLink" target="_blank">Error code list</a></p>
+    </details>
+  </main>
+  <script type="module" src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!doctype html>
+<!-- A stand-in GearHunter results page using Long & McQuade's card markup, that
+     runs the real src/content.js with a fake chrome.* whose storage survives
+     reloads (localStorage). Serve the repo root and open /tests/fake-gearhunter.html -->
+<html lang="en"><head><meta charset="utf-8"><title>Fake GearHunter</title>
+<style>
+  body { font: 14px system-ui, sans-serif; margin: 0; background: #fff; }
+  .bar { background: #222; color: #fff; padding: 10px 12px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .row { display: flex; flex-wrap: wrap; padding: 6px; }
+  .m-item { width: 25%; box-sizing: border-box; padding: 8px; }
+  a { display: block; color: inherit; text-decoration: none; }
+  .products-item { border: 1px solid #ddd; height: 100%; display: flex; flex-direction: column; }
+  .img { height: 120px; background: linear-gradient(135deg, #e07a5f, #3d405b 50%, #81b29a); }
+  .products-item-descr { padding: 6px; text-align: center; }
+  p { margin: 0; }
+  .text-red { color: #c8102e; }
+</style></head>
+<body>
+<div class="bar">
+  <button id="reload">Reload (next visit)</button>
+  <button id="drop">Store marks down the Strat</button>
+  <button id="reset">Reset test</button>
+  <span id="status"></span>
+</div>
+<div class="row" id="grid"></div>
+<script>
+  history.replaceState(null, "", "/GearHunter/departments/12/Guitars/Electric.htm");
+  const items = [
+    ["1150302", "FENDER KINGFISH DELTA DAY TELE DELUXE", 2299.99, 3379.99, "Oshawa", "Ontario"],
+    ["1118312", "Charvel Guitars - Pro-Mod So-Cal Style 1", 929, 1379.99, "Langford", "British Columbia"],
+    ["752122", "Gibson - ES3000SCNH", 3999, 4699, "Toronto", "Ontario"],
+    ["935664", "Fender Custom Shop - 923-5001-539", 5775, 6275, "Vaudreuil-Dorion", "Quebec"],
+    ["800001", "Fender Player Stratocaster", 899, 1099, "Calgary", "Alberta"],
+    ["800002", "Squier Classic Vibe Tele", 449, 579, "Halifax", "Nova Scotia"],
+    ["800003", "PRS SE Custom 24", 849, 1049, "Ottawa", "Ontario"],
+    ["800004", "Gretsch G2622 Streamliner", 599, 749, "Winnipeg", "Manitoba"],
+  ];
+  const prices = JSON.parse(localStorage.fakePrices || "{}");
+  const $ = (n) => "$" + n.toLocaleString("en-CA", { minimumFractionDigits: 2 });
+  document.getElementById("grid").innerHTML = items.map(([id, title, sale, reg, city, prov]) => {
+    const p = prices[id] ?? sale;
+    const slug = title.replace(/[^A-Za-z0-9]+/g, "-");
+    return `<div class="col-6 m-item"><a class="products-item-link" href="/GearHunter/${id}/${slug}.htm" title="${title}">
+      <div class="products-item"><div class="img"></div><div class="products-item-descr">
+        <p class="d-none d-md-block fw-bolder">${title}</p>
+        <div><p>Sale Price: <span class="text-red">${$(p)}</span></p><p>or from: <b>${$(Math.round(p / 21))}/mo</b></p><p>Regular Price: ${$(reg)}</p></div>
+        <div><p>${city},</p><p>${prov}</p><p>(555) 555-0100</p></div>
+      </div></div></a></div>`;
+  }).join("");
+
+  const store = JSON.parse(localStorage.fakeStore || "{}");
+  const persist = () => { localStorage.fakeStore = JSON.stringify(store); };
+  const listeners = [];
+  window.msgs = [];
+  window.chrome = {
+    runtime: { id: "test", sendMessage: async (m) => { window.msgs.push(m); if (m.type === "count") { const st = document.getElementById("status"); if (st.textContent !== `badge: ${m.n} hidden`) st.textContent = `badge: ${m.n} hidden`; } } },
+    storage: {
+      local: {
+        get: async (k) => (k == null ? { ...store } : Object.fromEntries([].concat(k).filter((x) => x in store).map((x) => [x, store[x]]))),
+        set: async (o) => {
+          const changes = Object.fromEntries(Object.entries(o).map(([k, v]) => [k, { oldValue: store[k], newValue: v }]));
+          Object.assign(store, o); persist(); listeners.forEach((f) => f(changes, "local"));
+        },
+        remove: async (k) => { const changes = {}; [].concat(k).forEach((x) => { changes[x] = { oldValue: store[x] }; delete store[x]; }); persist(); listeners.forEach((f) => f(changes, "local")); },
+      },
+      onChanged: { addListener: (f) => listeners.push(f) },
+    },
+  };
+  const go = () => { location.href = "/tests/fake-gearhunter.html"; };
+  document.getElementById("reload").onclick = go;
+  document.getElementById("drop").onclick = () => { prices["800001"] = 799; localStorage.fakePrices = JSON.stringify(prices); go(); };
+  document.getElementById("reset").onclick = () => { delete localStorage.fakeStore; delete localStorage.fakePrices; go(); };
+</script>
+<script src="/src/content.js"></script>
+</body></html>
