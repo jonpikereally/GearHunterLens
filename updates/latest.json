@@ -1,0 +1,5 @@
+{
+  "version": "1.0.0",
+  "url": "GearHunterLens.zip",
+  "notes": "First release: blurs Long & McQuade GearHunter items you've already seen, unless the price has changed."
+}
