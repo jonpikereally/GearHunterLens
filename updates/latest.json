@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "url": "GearHunterLens.zip",
-  "notes": "First release: blurs Long & McQuade GearHunter items you've already seen, unless the price has changed."
+  "notes": "New: mark a item as not interesting. Hover it and click the \u2715 (or \"Not interested\" on a blurred one) and it gets a solid \"Manually rejected\" panel on every visit, even if the price changes; the panel notes any price change. Click to peek, or Undo. The popup shows how many you've rejected, with Un-reject all."
 }
