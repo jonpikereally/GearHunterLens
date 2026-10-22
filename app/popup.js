@@ -105,6 +105,9 @@ async function render() {
   $("#forgetDays").value = String(settings.forgetDays);
   $("#updateSource").value = settings.updateSource || "";
   $("#total").textContent = listings.length.toLocaleString();
+  const rejected = listings.filter(([, r]) => r && r.x).length;
+  $("#rejected").textContent = rejected.toLocaleString();
+  $("#unrejectAll").hidden = !rejected;
   $("#versionLine").textContent = `You have Gear Hunter Lens v${VERSION}.`;
   $("#ghLink").href = `https://github.com/${REPO}`;
   $("#errLink").href = ERROR_LIST_URL;
@@ -146,6 +149,21 @@ const doImport = guard("GH-401", async (file) => {
   await render();
 });
 
+const doUnrejectAll = guard("GH-301", async () => {
+  const store = await chrome.storage.local.get(null);
+  const patch = {};
+  for (const [k, v] of Object.entries(store)) {
+    if (!k.startsWith(KEY) || !v || !v.x) continue;
+    const { x, xp, xv, ...rest } = v;
+    patch[k] = rest;
+  }
+  const n = Object.keys(patch).length;
+  if (!n || !confirm(`Un-reject ${n === 1 ? "the 1 rejected item" : `all ${n.toLocaleString()} items`}? They'll go back to normal: blurred if you've seen them, shown if the price changes.`)) return;
+  await chrome.storage.local.set(patch);
+  $("#dataResult").textContent = `Un-rejected ${n.toLocaleString()} item${n === 1 ? "" : "s"}.`;
+  await render();
+});
+
 const doForget = guard("GH-301", async () => {
   const store = await chrome.storage.local.get(null);
   const keys = Object.keys(store).filter((k) => k.startsWith(KEY));
@@ -180,6 +198,7 @@ $("#export").onclick = doExport;
 $("#import").onclick = () => $("#importFile").click();
 $("#importFile").onchange = (e) => e.target.files[0] && doImport(e.target.files[0]);
 $("#forget").onclick = doForget;
+$("#unrejectAll").onclick = doUnrejectAll;
 $("#checkUpdates").onclick = guard("GH-999", async (e) => {
   e.target.textContent = "Checking for Updates…";
   const u = await chrome.runtime.sendMessage({ type: "checkUpdates" });

@@ -15,6 +15,7 @@ GearHunter lists used, demo and clearance gear across every Long & McQuade store
 
   Clicking a blurred item shows it for the rest of that visit, without opening it.
 - **Shows markdowns.** If a seen item comes back at a different price, it stays visible with a tag: **↓ was $899.00** (green) or **↑ was $249.00** (orange). The popup lists recent price changes with the store they're at.
+- **Reject items you're not interested in.** Hover any item and click the **✕** in its corner (or click **Not interested** on a blurred one). It gets a solid, opaque **"Manually rejected"** panel right away and on every later visit, whatever your blur setting, and even if the price changes. If it does change, the panel says so ("Now … (was … when you rejected it)"). Click the panel to peek for that visit, or **Undo** to un-reject. Settings shows how many you've rejected, with **Un-reject all**.
 - **Toolbar badge** shows how many items are hidden on the current page.
 - **Peek** at hidden items from the popup, or switch hiding off entirely.
 - **Show seen items again** after 7, 30 or 90 days, if you like (default: never).
